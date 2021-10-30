@@ -1,0 +1,20 @@
+#!/bin/bash
+set -x
+
+oldExtension='.ts'
+newExtension='.mkv'
+
+
+function convertFile(){
+	local fileName=$1
+    local removeExtension=${fileName%"$oldExtension"}
+    local newFileName=${removeExtension}${newExtension}
+	ffmpeg -i ${fileName} -c:v libx265 -crf 26 -preset fast -c:a libopus -b:a 128k ${newFileName} 
+}
+
+
+for file in $(ls -1|grep "$oldExtension"); do
+	convertFile "$file"
+done
+
+

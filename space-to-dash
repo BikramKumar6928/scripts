@@ -1,0 +1,47 @@
+#!/bin/bash
+
+#set -x
+
+# This is a utility to convert virgin file names with space with chad file names with dashes.
+# Can be used to replace underscores with dashes. Or any character with any character to be precise.
+
+#Config
+realMode=true
+replaceChar=" "
+replaceWithChar="-"
+
+# -----------------------------------------------------------
+
+function replaceCharacter(){
+	local file=$1
+	# Only replace the last part. The upper parts will be replaced later.
+	local fileName=${file##.*/}
+	local basePath=${file%"/$fileName"}
+    local newFileName=${fileName//"$replaceChar"/"$replaceWithChar"}
+	local newFile=${basePath}/${newFileName}
+	echo "$newFile"
+
+}
+
+function renameFile(){
+	local file=$1
+	newFile=$(replaceCharacter "$file")
+
+	if [ "${file}" == "$newFile" ]; then
+		return
+	fi
+	if [ "$realMode" == "true" ]; then
+		mv -i "$file" "$newFile"
+	else
+		echo "mv '$file' '$newFile'"
+	fi
+}
+
+# Using this method to account for names with spaces
+SAVEIFS=$IFS
+IFS=$(echo -en "\n\b")
+FILES=$(du -a | sed "s/^\w*\s*//"| grep "${replaceChar}")
+for f in $FILES; do
+  renameFile $f
+done
+IFS=$SAVEIFS
