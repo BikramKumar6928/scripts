@@ -1,3 +1,5 @@
+#!/bin/bash
+
 adb pull /storage/emulated/0/Download/magisk_patched-*
 adb reboot fastboot
 fastboot flash boot magisk_patched-*img

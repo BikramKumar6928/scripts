@@ -1,0 +1,10 @@
+#!/bin/bash
+
+wineprefixFolder=~/.local/share/wineprefixes
+wineFolder=~/.wine
+
+
+folder=$(ls $wineprefixFolder | dmenu -p "Select folder to map")
+
+rm -f $wineFolder && ln -s $wineprefixFolder/$folder $wineFolder || kdialog --passivepopup "$wineFolder is not a soft link. Please make a soft link or delete the folder. " 5
+
