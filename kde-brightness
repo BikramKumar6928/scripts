@@ -1,0 +1,23 @@
+#!/bin/bash
+#set -x
+
+#Usage :- 
+#kde-brightness up -> increase brightness as mentioned in config
+#kde-brightness    -> decrease brightness as mentioned in config
+
+#-----------------------------CONFIG
+
+stepPercent=5
+minValue=100
+
+#-----------------------------
+
+[[ "$1" -eq "up" ]] && changeString="+${stepPercent}%" || changeString="${stepPercent}%-"
+
+output=$(brightnessctl -n"$minValue" set "$changeString" | grep Current | cut -d' ' -f 4)
+
+output=${output%\%)}
+output=${output#(}
+
+
+qdbus org.kde.plasmashell /org/kde/osdService brightnessChanged ${output}
