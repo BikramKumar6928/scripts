@@ -1,5 +1,4 @@
 #!/bin/bash
-set -x
 
 oldExtension='.ts'
 newExtension='.mkv'
@@ -7,8 +6,8 @@ newExtension='.mkv'
 
 function convertFile(){
 	local fileName=$1
-    local removeExtension=${fileName%"$oldExtension"}
-    local newFileName=${removeExtension}${newExtension}
+	local removeExtension=${fileName%"$oldExtension"}
+	local newFileName=${removeExtension}${newExtension}
 	ffmpeg -i ${fileName} -c:v libx265 -crf 26 -preset fast -c:a libopus -b:a 128k ${newFileName} 
 }
 

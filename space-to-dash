@@ -14,11 +14,8 @@ replaceWithChar="-"
 
 function replaceCharacter(){
 	local file=$1
-	# Only replace the last part. The upper parts will be replaced later.
-	local fileName=${file##.*/}
-	local basePath=${file%"/$fileName"}
-    local newFileName=${fileName//"$replaceChar"/"$replaceWithChar"}
-	local newFile=${basePath}/${newFileName}
+	# Replace the characters in first expression. Replace more than one occurence of replaced character to a single character in second expression.	
+	local newFile=$(echo $file | sed -e "s/${replaceChar}/${replaceWithChar}/g" -r -e  "s/[${replaceWithChar}]+/${replaceWithChar}/g")
 	echo "$newFile"
 
 }
@@ -40,7 +37,8 @@ function renameFile(){
 # Using this method to account for names with spaces
 SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")
-FILES=$(du -a | sed "s/^\w*\s*//"| grep "${replaceChar}")
+#FILES=$(du -a | sed "s/^\w*\s*//"| grep "${replaceChar}")
+FILES=$(du -a | sed "s/^\w*\s*//" )
 for f in $FILES; do
   renameFile $f
 done
