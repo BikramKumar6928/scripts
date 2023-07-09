@@ -1,0 +1,22 @@
+#!/usr/bin/env ruby
+
+require "shellwords"
+
+file_names = `ls -1`.split
+file_names = file_names.reject { |file_name| file_name == 'comics.txt'}
+
+comics_list = file_names.map do |file_name|
+  extension_dot_index = file_name.rindex('.')
+  file_name_without_extension = file_name[0..extension_dot_index - 1]
+  "#{file_name}:Chapter - #{file_name_without_extension}"
+end
+
+File.open('comics.txt', 'w+') do |file|
+  comics_list.each { |comic_entry| file.puts(comic_entry) }
+end
+
+current_directory_name = `basename "$PWD"`.strip
+cbc_name = "#{current_directory_name}.cbc"
+escaped_name = Shellwords.escape(cbc_name)
+`zip  "#{escaped_name}" *`
+

@@ -1,45 +1,44 @@
-#!/bin/bash
-
-#set -x
+#!/usr/bin/env ruby
 
 # This is a utility to convert virgin file names with space with chad file names with dashes.
 # Can be used to replace underscores with dashes. Or any character with any character to be precise.
 
-#Config
-realMode=true
-replaceChar=" "
-replaceWithChar="-"
+require 'optparse'
+require 'pry-byebug'
 
-# -----------------------------------------------------------
 
-function replaceCharacter(){
-	local file=$1
-	# Replace the characters in first expression. Replace more than one occurence of replaced character to a single character in second expression.	
-	local newFile=$(echo $file | sed -e "s/${replaceChar}/${replaceWithChar}/g" -r -e  "s/[${replaceWithChar}]+/${replaceWithChar}/g")
-	echo "$newFile"
+real_mode = true
+replace_char = " "
+replace_with_char = "-"
 
-}
+hash_options = {}
+OptionParser.new do |opts|
+  opts.banner = "Usage: space-to-dash [options]"
+  opts.on('-d [ARG]', '--depth [ARG]', "Specify the depth") do |v|
+    hash_options[:depth] = v
+  end
+  opts.on('-h', '--help', 'Display this help') do 
+    puts opts
+    exit
+  end
+end.parse!
 
-function renameFile(){
-	local file=$1
-	newFile=$(replaceCharacter "$file")
 
-	if [ "${file}" == "$newFile" ]; then
-		return
-	fi
-	if [ "$realMode" == "true" ]; then
-		mv -i "$file" "$newFile"
-	else
-		echo "mv '$file' '$newFile'"
-	fi
-}
+max_depth = hash_options[:depth] || '1'
+max_depth = max_depth.to_i
 
-# Using this method to account for names with spaces
-SAVEIFS=$IFS
-IFS=$(echo -en "\n\b")
-#FILES=$(du -a | sed "s/^\w*\s*//"| grep "${replaceChar}")
-FILES=$(du -a | sed "s/^\w*\s*//" )
-for f in $FILES; do
-  renameFile $f
-done
-IFS=$SAVEIFS
+(1..max_depth).each do |depth|
+  file_names_string = `find . -mindepth #{depth} -maxdepth #{depth}`
+  file_names = file_names_string.split("\n")
+  file_names.each do |file_name|
+    new_file_name = file_name.gsub(replace_char, replace_with_char)
+    next if new_file_name == file_name
+
+    command = %{mv "#{file_name}" "#{new_file_name}"}
+    if real_mode
+      `#{command}`
+    else
+      puts(command)
+    end
+  end
+end

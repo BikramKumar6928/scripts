@@ -1,19 +1,39 @@
-#!/bin/bash
+#!/usr/bin/env ruby
 
-oldExtension='.ts'
-newExtension='.mkv'
-
-
-function convertFile(){
-	local fileName=$1
-	local removeExtension=${fileName%"$oldExtension"}
-	local newFileName=${removeExtension}${newExtension}
-	ffmpeg -i ${fileName} -c:v libx265 -crf 26 -preset fast -c:a libopus -b:a 128k ${newFileName} 
-}
+require 'optparse'
+require 'pry-byebug'
 
 
-for file in $(ls -1|grep "$oldExtension"); do
-	convertFile "$file"
-done
+real_mode = true
+old_extension = ".ts"
+new_extension = ".mkv"
 
+hash_options = {}
+hash_options[:convert] = false
+
+OptionParser.new do |opts|
+  opts.banner = "Usage: convert-ts-to-mkv [options]"
+  opts.on('-c', '--convert', "Convert into mkv instead of copying codec") do |v|
+    hash_options[:convert] = true
+  end
+  opts.on('-h', '--help', 'Display this help') do 
+    puts opts
+    exit
+  end
+end.parse!
+
+
+file_names_string = `ls -1 | grep -F #{old_extension}`
+file_names = file_names_string.split("\n")
+file_names.each do |file_name|
+  should_convert = hash_options[:convert]
+  new_file_name = file_name.gsub(old_extension, new_extension)
+  quoted_file_name = %{"#{file_name}"}
+  quoted_new_file_name = %{"#{new_file_name}"}
+  if(should_convert)
+    `ffmpeg -i #{quoted_file_name} -c:v libx265 -crf 26 -preset fast -c:a libopus -b:a 128k #{quoted_new_file_name}`
+  else
+    `ffmpeg -i #{quoted_file_name} -map 0 -c copy #{quoted_new_file_name}`
+  end
+end
 

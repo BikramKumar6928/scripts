@@ -1,0 +1,6 @@
+#!/bin/bash
+
+deviceMAC=$(bluetoothctl devices Connected | cut -f2 -d' ')
+
+bluetoothctl disconnect ${deviceMAC}
+bluetoothctl connect ${deviceMAC}

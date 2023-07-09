@@ -1,0 +1,10 @@
+#!/bin/bash
+#set -x 
+find . -type f | while read -r filename; do
+	initial_dot_slash_truncated_filename=${filename#*/}
+	filename_without_directory=${initial_dot_slash_truncated_filename#*/}
+	if [[ "$initial_dot_slash_truncated_filename" == "$filename_without_directory" ]]; then
+		continue
+	fi
+	mv "$initial_dot_slash_truncated_filename" "$filename_without_directory"
+done

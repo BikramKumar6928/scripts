@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+require 'pry-byebug'
+
+real_mode = true
+replace_char = " "
+replace_with_char = "-"
+
+# Not used till now. Use it if needed
+
+# hash_options = {}
+# OptionParser.new do |opts|
+#   opts.banner = "Usage: space-to-dash [options]"
+#   opts.on('-d [ARG]', '--depth [ARG]', "Specify the depth") do |v|
+#     hash_options[:depth] = v
+#   end
+#   opts.on('-h', '--help', 'Display this help') do 
+#     puts opts
+#     exit
+#   end
+# end.parse!
+
+parent_folder_name = `basename "$PWD"`
+parent_folder_name.strip!
+file_names_string = `ls -1`
+file_names = file_names_string.split("\n")
+file_names.each do |file_name|
+  file_name = file_name.strip
+  new_file_name = "#{parent_folder_name} #{file_name}"
+  quoted_new_file_name = %{"#{new_file_name}"}
+  quoted_file_name = %{"#{file_name}"}
+  command = "mv #{quoted_file_name} #{quoted_new_file_name}"
+  if real_mode
+    `#{command}`
+  else
+    puts command
+  end
+end
