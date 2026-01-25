@@ -4,7 +4,7 @@
 # Can be used to replace underscores with dashes. Or any character with any character to be precise.
 
 require 'optparse'
-require 'pry-byebug'
+#require 'pry-byebug'
 
 
 real_mode = true
