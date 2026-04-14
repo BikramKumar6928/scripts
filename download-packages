@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+
+SESSION_NAME = "download-packages-session"
+COMMAND      = "sudo pacman -Syuw"
+
+def session_exists?(name)
+  system("tmux has-session -t #{name} 2>/dev/null")
+end
+
+unless session_exists?(SESSION_NAME)
+  puts "Creating tmux session: #{SESSION_NAME}"
+  system("tmux new-session -d -s #{SESSION_NAME} '#{COMMAND}'")
+end
+
+exec("tmux attach-session -t #{SESSION_NAME}")
+
